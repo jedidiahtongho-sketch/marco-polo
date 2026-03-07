@@ -58,7 +58,7 @@ interface GameState {
   incrementDoorUnlockAttempt: () => void
   resetDoorUnlock: () => void
   teleportPlayer: () => void
-  setCurrentWorld: (world: 'room' | 'forest' | 'dungeon') => void
+  setCurrentWorld: (world: 'room' | 'forest' | 'dungeon' | 'cave' | 'kennel' | 'orchard') => void
   awakenMonster: () => void
   collectPlank: () => void
   showBlackDoor: () => void
@@ -95,7 +95,7 @@ const initialState = {
   doorUnlockRequired: 3,
   shouldTeleport: false,
   isGameComplete: false,
-  currentWorld: 'room' as 'room' | 'forest' | 'dungeon' | 'cave' | 'kennel',
+  currentWorld: 'room' as 'room' | 'forest' | 'dungeon' | 'cave' | 'kennel' | 'orchard',
   monsterAwakened: false,
   planksCollected: 0,
   totalPlanks: 7,
@@ -111,6 +111,8 @@ const initialState = {
   totalBones: 9,
   grapeVinesCollected: 0,
   totalGrapeVines: 10,
+  canJump: () => false,
+  recordJump: () => {},
 }
 
 export const useGameStore = create<GameState>((set) => ({

@@ -8,7 +8,7 @@ interface GameUIProps {
   poloCoins: number
   collectedCodes: string[]
   monsterType: string
-  currentWorld: 'room' | 'forest' | 'dungeon'
+  currentWorld: 'room' | 'forest' | 'dungeon' | 'cave' | 'kennel' | 'orchard'
   roomTimeLeft: number
   leviathanActive: boolean
 }

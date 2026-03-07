@@ -1,7 +1,7 @@
 import { usePlane, useBox } from '@react-three/cannon'
 import { useGameStore } from '@/store/gameStore'
 import { useState, useRef } from 'react'
-import { Html } from '@react-three/drei'
+import { Html, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 
 function Tree({ position, height }: { position: [number, number, number], height: number }) {
@@ -20,6 +20,275 @@ function Tree({ position, height }: { position: [number, number, number], height
       <mesh position={[0, height + 2.5, 0]} castShadow>
         <sphereGeometry args={[1.5, 8, 6]} />
         <meshStandardMaterial color="#32CD32" />
+      </mesh>
+    </group>
+  )
+}
+
+function RealisticTable({ position }: { position: [number, number, number] }) {
+  // Create wood-like material with procedural properties
+  const woodMaterial = {
+    color: '#8B4513',
+    roughness: 0.8,
+    metalness: 0.1,
+    // Add some variation to simulate wood grain
+    normalScale: new THREE.Vector2(0.5, 0.5),
+  }
+
+  const legPositions = [
+    [-0.9, 0.5, -0.4], // front left
+    [0.9, 0.5, -0.4],  // front right
+    [-0.9, 0.5, 0.4],  // back left
+    [0.9, 0.5, 0.4],   // back right
+  ]
+
+  // Physics for table top
+  useBox(() => ({
+    position: [position[0], position[1] + 1, position[2]],
+    args: [2, 0.1, 1],
+    type: 'Static'
+  }))
+
+  // Physics for legs
+  legPositions.forEach((legPos) => {
+    useBox(() => ({
+      position: [position[0] + legPos[0], position[1] + legPos[1], position[2] + legPos[2]],
+      args: [0.05, 1, 0.05],
+      type: 'Static'
+    }))
+  })
+
+  return (
+    <group position={position}>
+      {/* Table top */}
+      <mesh position={[0, 1, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2, 0.1, 1]} />
+        <meshStandardMaterial {...woodMaterial} />
+      </mesh>
+
+      {/* Table legs */}
+      {legPositions.map((legPos, index) => (
+        <mesh key={index} position={legPos as [number, number, number]} castShadow>
+          <cylinderGeometry args={[0.05, 0.05, 1, 8]} />
+          <meshStandardMaterial {...woodMaterial} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function RealisticBookshelf({ position }: { position: [number, number, number] }) {
+  const woodMaterial = {
+    color: '#654321',
+    roughness: 0.7,
+    metalness: 0.05,
+  }
+
+  // Physics for main frame
+  useBox(() => ({
+    position: [position[0], position[1] + 2, position[2]],
+    args: [1, 4, 3],
+    type: 'Static'
+  }))
+
+  // Physics for shelves
+  const shelfHeights = [0.5, 1.5, 2.5, 3.5]
+  shelfHeights.forEach((y) => {
+    useBox(() => ({
+      position: [position[0], position[1] + y, position[2]],
+      args: [0.9, 0.05, 2.8],
+      type: 'Static'
+    }))
+  })
+
+  return (
+    <group position={position}>
+      {/* Main bookshelf frame */}
+      <mesh position={[0, 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1, 4, 3]} />
+        <meshStandardMaterial {...woodMaterial} />
+      </mesh>
+
+      {/* Shelves */}
+      {shelfHeights.map((y, index) => (
+        <mesh key={index} position={[0, y, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.9, 0.05, 2.8]} />
+          <meshStandardMaterial {...woodMaterial} />
+        </mesh>
+      ))}
+
+      {/* Books (simulated with different colored boxes) */}
+      {Array.from({ length: 12 }, (_, i) => {
+        const shelf = Math.floor(i / 3)
+        const bookInShelf = i % 3
+        const x = (bookInShelf - 1) * 0.3
+        const y = 0.5 + shelf * 1
+        const z = (Math.random() - 0.5) * 0.1
+        const height = 0.8 + Math.random() * 0.4
+        const color = ['#8B0000', '#000080', '#006400', '#8B4513'][Math.floor(Math.random() * 4)]
+
+        return (
+          <mesh key={i} position={[x, y + height/2, z]} castShadow>
+            <boxGeometry args={[0.2, height, 0.15]} />
+            <meshStandardMaterial color={color} roughness={0.9} />
+          </mesh>
+        )
+      })}
+    </group>
+  )
+}
+
+function RealisticBed({ position }: { position: [number, number, number] }) {
+  const woodMaterial = {
+    color: '#654321',
+    roughness: 0.8,
+    metalness: 0.1,
+  }
+
+  const fabricMaterial = {
+    color: '#4169E1',
+    roughness: 0.9,
+    metalness: 0.0,
+  }
+
+  // Physics for bed frame
+  useBox(() => ({
+    position: [position[0], position[1] + 0.3, position[2]],
+    args: [3, 0.6, 2],
+    type: 'Static'
+  }))
+
+  // Physics for mattress
+  useBox(() => ({
+    position: [position[0], position[1] + 0.7, position[2]],
+    args: [2.8, 0.4, 1.8],
+    type: 'Static'
+  }))
+
+  // Physics for bed legs
+  const bedLegPositions = [
+    [-1.3, 0.15, -0.8],
+    [1.3, 0.15, -0.8],
+    [-1.3, 0.15, 0.8],
+    [1.3, 0.15, 0.8]
+  ]
+  bedLegPositions.forEach((legPos) => {
+    useBox(() => ({
+      position: [position[0] + legPos[0], position[1] + legPos[1], position[2] + legPos[2]],
+      args: [0.05, 0.3, 0.05],
+      type: 'Static'
+    }))
+  })
+
+  return (
+    <group position={position}>
+      {/* Bed frame */}
+      <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
+        <boxGeometry args={[3, 0.6, 2]} />
+        <meshStandardMaterial {...woodMaterial} />
+      </mesh>
+
+      {/* Mattress */}
+      <mesh position={[0, 0.7, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.8, 0.4, 1.8]} />
+        <meshStandardMaterial {...fabricMaterial} />
+      </mesh>
+
+      {/* Pillows */}
+      <mesh position={[-1, 0.9, -0.3]} castShadow>
+        <boxGeometry args={[0.6, 0.2, 0.4]} />
+        <meshStandardMaterial color="#FFFFFF" roughness={0.9} />
+      </mesh>
+      <mesh position={[1, 0.9, -0.3]} castShadow>
+        <boxGeometry args={[0.6, 0.2, 0.4]} />
+        <meshStandardMaterial color="#FFFFFF" roughness={0.9} />
+      </mesh>
+
+      {/* Bed legs */}
+      {bedLegPositions.map((legPos, index) => (
+        <mesh key={index} position={legPos as [number, number, number]} castShadow>
+          <cylinderGeometry args={[0.05, 0.05, 0.3, 6]} />
+          <meshStandardMaterial {...woodMaterial} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function RealisticCouch({ position }: { position: [number, number, number] }) {
+  const woodMaterial = {
+    color: '#654321',
+    roughness: 0.8,
+    metalness: 0.1,
+  }
+
+  const fabricMaterial = {
+    color: '#8B4513',
+    roughness: 0.9,
+    metalness: 0.0,
+  }
+
+  // Physics for couch base
+  useBox(() => ({
+    position: [position[0], position[1] + 0.4, position[2]],
+    args: [4, 0.8, 2],
+    type: 'Static'
+  }))
+
+  // Physics for cushions
+  useBox(() => ({
+    position: [position[0], position[1] + 0.8, position[2]],
+    args: [3.8, 0.4, 1.8],
+    type: 'Static'
+  }))
+
+  // Physics for back
+  useBox(() => ({
+    position: [position[0], position[1] + 1.2, position[2] - 0.8],
+    args: [3.8, 1.2, 0.2],
+    type: 'Static'
+  }))
+
+  // Physics for arms
+  useBox(() => ({
+    position: [position[0] - 1.9, position[1] + 0.8, position[2]],
+    args: [0.2, 0.8, 1.8],
+    type: 'Static'
+  }))
+  useBox(() => ({
+    position: [position[0] + 1.9, position[1] + 0.8, position[2]],
+    args: [0.2, 0.8, 1.8],
+    type: 'Static'
+  }))
+
+  return (
+    <group position={position}>
+      {/* Couch base */}
+      <mesh position={[0, 0.4, 0]} castShadow receiveShadow>
+        <boxGeometry args={[4, 0.8, 2]} />
+        <meshStandardMaterial {...woodMaterial} />
+      </mesh>
+
+      {/* Couch cushions */}
+      <mesh position={[0, 0.8, 0]} castShadow receiveShadow>
+        <boxGeometry args={[3.8, 0.4, 1.8]} />
+        <meshStandardMaterial {...fabricMaterial} />
+      </mesh>
+
+      {/* Couch back */}
+      <mesh position={[0, 1.2, -0.8]} castShadow receiveShadow>
+        <boxGeometry args={[3.8, 1.2, 0.2]} />
+        <meshStandardMaterial {...fabricMaterial} />
+      </mesh>
+
+      {/* Couch arms */}
+      <mesh position={[-1.9, 0.8, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.2, 0.8, 1.8]} />
+        <meshStandardMaterial {...woodMaterial} />
+      </mesh>
+      <mesh position={[1.9, 0.8, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.2, 0.8, 1.8]} />
+        <meshStandardMaterial {...woodMaterial} />
       </mesh>
     </group>
   )
@@ -305,13 +574,21 @@ function FruitTree({ position, type }: { position: [number, number, number], typ
 }
 
 function ExitDoor({ position }: any) {
-  const { keysCollected, totalKeys, teleportPlayer, setCurrentWorld, currentWorld, setGameComplete } = useGameStore()
+  const { keysCollected, totalKeys, bonesCollected, totalBones, grapeVinesCollected, totalGrapeVines, teleportPlayer, setCurrentWorld, currentWorld, setGameComplete } = useGameStore()
   const [isShaking, setIsShaking] = useState(false)
   const glowIntensity = 0.5 // Fixed glow intensity
 
+  const getRequiredCollectibles = () => {
+    if (currentWorld === 'kennel') return { collected: bonesCollected, total: totalBones, name: 'bones' }
+    if (currentWorld === 'orchard') return { collected: grapeVinesCollected, total: totalGrapeVines, name: 'grape vines' }
+    return { collected: keysCollected, total: totalKeys, name: 'keys' }
+  }
+
+  const { collected, total, name } = getRequiredCollectibles()
+
   const handleDoorInteraction = () => {
-    if (keysCollected < totalKeys) {
-      // Not enough keys - play locked sound and shake
+    if (collected < total) {
+      // Not enough collectibles - play locked sound and shake
       setIsShaking(true)
       setTimeout(() => setIsShaking(false), 500)
       return
@@ -381,7 +658,7 @@ function ExitDoor({ position }: any) {
         <meshStandardMaterial color="#ffff00" />
       </mesh>
       {/* Progress indicator */}
-      {keysCollected >= totalKeys && (
+      {collected >= total && (
         <mesh position={[0, -2.5, 0.15]}>
           <planeGeometry args={[2, 0.5]} />
           <meshBasicMaterial color="#000000" transparent opacity={0.8} />
@@ -392,6 +669,7 @@ function ExitDoor({ position }: any) {
                 currentWorld === 'forest' ? 'STAGE 3 - DUNGEON' :
                 currentWorld === 'dungeon' ? 'STAGE 4 - CAVE' :
                 currentWorld === 'cave' ? 'STAGE 5 - KENNEL' :
+                currentWorld === 'kennel' ? 'STAGE 6 - ORCHARD' :
                 'VICTORY!'
               }!
             </div>
@@ -557,6 +835,47 @@ function Bone({ position, collected, onCollect }: any) {
         <Html center>
           <div style={{ color: '#ff6b35', fontSize: '9px', textAlign: 'center', fontWeight: 'bold' }}>
             BONE
+          </div>
+        </Html>
+      </mesh>
+    </group>
+  )
+}
+
+function Crystal({ position, collected, onCollect }: any) {
+  useBox(() => ({
+    position,
+    args: [0.4, 0.8, 0.4], // Crystal size - tall and narrow
+    type: 'Static',
+    isTrigger: true,
+    onCollide: (e: any) => {
+      if (!collected && e.body.userData?.type === 'player') {
+        onCollect()
+      }
+    }
+  }))
+
+  if (collected) return null
+
+  return (
+    <group position={position}>
+      <mesh castShadow>
+        <octahedronGeometry args={[0.4, 0]} />
+        <meshStandardMaterial
+          color="#9370DB"
+          emissive="#9370DB"
+          emissiveIntensity={0.2}
+          transparent
+          opacity={0.8}
+        />
+      </mesh>
+      {/* Item label */}
+      <mesh position={[0, 0.5, 0.21]}>
+        <planeGeometry args={[0.8, 0.12]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.8} />
+        <Html center>
+          <div style={{ color: '#ff6b35', fontSize: '9px', textAlign: 'center', fontWeight: 'bold' }}>
+            CRYSTAL
           </div>
         </Html>
       </mesh>
@@ -983,7 +1302,7 @@ function generateCaveWalls() {
   return walls
 }
 
-function generateCaveFormations() {
+function generateCaveFormations(): { position: [number, number, number], type: 'stalactite' | 'stalagmite' }[] {
   // Stalactites (hanging from ceiling) and stalagmites (rising from floor)
   return [
     { position: [-20, 8, -15] as [number, number, number], type: 'stalactite' },
@@ -1054,6 +1373,38 @@ function generateKennelStructures() {
       color: '#696969',
       type: 'chain'
     },
+  ]
+}
+
+function generateOrchardGrapeVinePositions() {
+  // Grape vines scattered in the orchard - need 10 to complete game
+  return [
+    [-30, 1, -20] as [number, number, number],   // Near apple tree
+    [25, 1, -15] as [number, number, number],    // Near orange tree
+    [-15, 1, 30] as [number, number, number],    // Near lemon tree
+    [35, 1, 25] as [number, number, number],     // Near kumquat tree
+    [0, 1, -35] as [number, number, number],     // Near grape tree
+    [-40, 1, 10] as [number, number, number],    // Near apple tree
+    [20, 1, 40] as [number, number, number],     // Hidden in bushes
+    [-25, 1, -40] as [number, number, number],   // Under tree
+    [45, 1, -5] as [number, number, number],     // Near edge
+    [-5, 1, 50] as [number, number, number],     // Final grape vine
+  ]
+}
+
+function generateOrchardFruitTrees(): { position: [number, number, number], type: string }[] {
+  // Fruit trees in the orchard
+  return [
+    { position: [-30, 0, -20] as [number, number, number], type: 'apple' },
+    { position: [25, 0, -15] as [number, number, number], type: 'orange' },
+    { position: [-15, 0, 30] as [number, number, number], type: 'lemon' },
+    { position: [35, 0, 25] as [number, number, number], type: 'kumquat' },
+    { position: [0, 0, -35] as [number, number, number], type: 'grape' },
+    { position: [-40, 0, 10] as [number, number, number], type: 'apple' },
+    { position: [20, 0, 40] as [number, number, number], type: 'orange' },
+    { position: [-25, 0, -40] as [number, number, number], type: 'lemon' },
+    { position: [45, 0, -5] as [number, number, number], type: 'kumquat' },
+    { position: [-5, 0, 50] as [number, number, number], type: 'grape' },
   ]
 }
 
@@ -1135,7 +1486,7 @@ function KennelStructure({ position, size, color, type }: any) {
 }
 
 export default function World({ onGameComplete }: { onGameComplete: () => void }) {
-  const { keysCollected, collectKey, totalKeys, poloCoinsCollected, collectPoloCoin, currentWorld, planksCollected, collectPlank, blackDoorVisible, crystalsCollected, collectCrystal, bonesCollected, collectBone, grapeVinesCollected, collectGrapeVine, setGameComplete } = useGameStore()
+  const { keysCollected, collectKey, totalKeys, poloCoinsCollected, collectPoloCoin, currentWorld, planksCollected, collectPlank, blackDoorVisible, crystalsCollected, collectCrystal, bonesCollected, collectBone, grapeVinesCollected, collectGrapeVine, setGameComplete, totalBones, totalGrapeVines } = useGameStore()
   const [keyPositions] = useState(() => generateBoxPositions())
   const [poloCoinPositions] = useState(() => generatePoloCoinPositions())
 
@@ -1153,7 +1504,8 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
         currentWorld === 'forest' ? ['#2d5a3d', 15, 75] : 
         currentWorld === 'dungeon' ? ['#0a0a0a', 8, 35] :
         currentWorld === 'cave' ? ['#1a1a2e', 12, 50] :
-        ['#8B4513', 8, 40] // Kennel fog - earthy brown
+        currentWorld === 'kennel' ? ['#8B4513', 8, 40] :
+        ['#228B22', 10, 60] // Orchard fog - green and misty
       } />
 
       {/* Ground */}
@@ -1194,6 +1546,16 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
             metalness={0.05}
           />
         </mesh>
+      ) : currentWorld === 'orchard' ? (
+        // Orchard ground - grassy field
+        <mesh ref={groundRef} receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+          <planeGeometry args={[150, 150]} />
+          <meshStandardMaterial
+            color="#4a7c59"
+            roughness={0.8}
+            metalness={0.0}
+          />
+        </mesh>
       ) : (
         // Kennel ground - dirt and grass
         <mesh ref={groundRef} receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
@@ -1215,9 +1577,19 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
           ))}
 
           {/* Furniture */}
-          {generateFurniture().map((item, i) => (
-            <Furniture key={i} {...item} />
-          ))}
+          {generateFurniture().map((item, i) => {
+            if (item.type === 'table') {
+              return <RealisticTable key={i} position={item.position as [number, number, number]} />
+            } else if (item.type === 'bookshelf') {
+              return <RealisticBookshelf key={i} position={item.position as [number, number, number]} />
+            } else if (item.type === 'bed') {
+              return <RealisticBed key={i} position={item.position as [number, number, number]} />
+            } else if (item.type === 'couch') {
+              return <RealisticCouch key={i} position={item.position as [number, number, number]} />
+            } else {
+              return <Furniture key={i} {...item} />
+            }
+          })}
         </>
       )}
 
@@ -1225,19 +1597,19 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
       {currentWorld === 'forest' && (
         <>
           {/* Trees scattered around */}
-          {generateForestTrees().map((tree, i) => (
-            <Tree key={i} position={tree.position} height={tree.height} />
-          ))}
+          {/* {generateForestTrees().map((tree, i) => (
+            <Tree key={i} position={tree.position as [number, number, number]} height={tree.height} />
+          ))} */}
 
           {/* Rocks and boulders */}
-          {generateForestRocks().map((rock, i) => (
+          {/* {generateForestRocks().map((rock, i) => (
             <Rock key={i} position={rock.position} size={rock.size} />
-          ))}
+          ))} */}
 
           {/* Water walls trapping the player */}
-          {generateForestWaterWalls().map((wall, i) => (
+          {/* {generateForestWaterWalls().map((wall, i) => (
             <WaterWall key={i} position={wall.position} size={wall.size} />
-          ))}
+          ))} */}
         </>
       )}
 
@@ -1373,8 +1745,10 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
         />
       ))}
 
-      {/* Exit door - only visible when all keys collected */}
-      {keysCollected >= totalKeys && (
+      {/* Exit door - only visible when all required collectibles collected */}
+      {((currentWorld === 'room' || currentWorld === 'dungeon') && keysCollected >= totalKeys) ||
+       (currentWorld === 'kennel' && bonesCollected >= totalBones) ||
+       (currentWorld === 'orchard' && grapeVinesCollected >= totalGrapeVines) && (
         <ExitDoor position={[8, 2, 3]} onGameComplete={onGameComplete} />
       )}
 
@@ -1394,11 +1768,13 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
         intensity={
           currentWorld === 'room' ? 0.02 : 
           currentWorld === 'forest' ? 0.1 : 
+          currentWorld === 'orchard' ? 0.15 :
           0.01 // Dungeon - extremely dark
         } 
         color={
           currentWorld === 'room' ? "#330000" : 
           currentWorld === 'forest' ? "#4a7c59" : 
+          currentWorld === 'orchard' ? "#228B22" :
           "#1a0033" // Dungeon - deep purple/black
         } 
       />

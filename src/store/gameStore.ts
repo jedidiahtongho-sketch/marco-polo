@@ -20,6 +20,9 @@ interface GameState {
   flashlightOn: boolean
   doorUnlockAttempts: number
   doorUnlockRequired: number
+  shouldTeleport: boolean
+  isGameComplete: boolean
+  currentWorld: 'room' | 'forest'
   
   setHealth: (health: number) => void
   decreaseHealth: (amount: number) => void
@@ -37,6 +40,8 @@ interface GameState {
   toggleFlashlight: () => void
   incrementDoorUnlockAttempt: () => void
   resetDoorUnlock: () => void
+  teleportPlayer: () => void
+  setCurrentWorld: (world: 'room' | 'forest') => void
   reset: () => void
 }
 
@@ -60,6 +65,9 @@ const initialState = {
   flashlightOn: true,
   doorUnlockAttempts: 0,
   doorUnlockRequired: 3,
+  shouldTeleport: false,
+  isGameComplete: false,
+  currentWorld: 'room' as 'room' | 'forest',
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -121,6 +129,14 @@ export const useGameStore = create<GameState>((set) => ({
   
   resetDoorUnlock: () => set({
     doorUnlockAttempts: 0
+  }),
+  
+  teleportPlayer: () => set({ shouldTeleport: true }),
+  
+  setCurrentWorld: (world) => set({ 
+    currentWorld: world,
+    keysCollected: world === 'forest' ? 0 : 0, // Reset keys when entering forest
+    totalKeys: world === 'forest' ? 7 : 5 // 7 planks in forest, 5 boxes in room
   }),
   
   reset: () => set(initialState),

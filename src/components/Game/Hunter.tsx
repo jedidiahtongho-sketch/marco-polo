@@ -6,7 +6,7 @@ import { audioManager } from '@/audio/AudioManager'
 import * as THREE from 'three'
 
 export default function Hunter() {
-  const { playerPosition, setHunterPosition, decreaseHealth, monsterType } = useGameStore()
+  const { playerPosition, setHunterPosition, monsterType } = useGameStore()
   const [, api] = useSphere(() => ({
     mass: 1,
     type: 'Dynamic',
@@ -96,18 +96,14 @@ export default function Hunter() {
       audioManager.playTerrifyingHeartbeat(heartbeatIntensity)
     }
 
-    // Proximity jumpscare - when monster gets very close - 1000x more terrifying
-    if (distanceToPlayer < 5 && now - lastLungeTime.current > 3000) { // Every 3 seconds instead of 10
-      audioManager.playJumpscare()
-      lastLungeTime.current = now
-      // Much more damage - 30 instead of 15
-      decreaseHealth(30)
-
-      // Add screen shake effect (if we had it)
-      // Add multiple overlapping jump scares for maximum terror
-      setTimeout(() => audioManager.playJumpscare(), 200)
-      setTimeout(() => audioManager.playJumpscare(), 400)
-    }
+    // Proximity jumpscare - DISABLED for now
+    // if (distanceToPlayer < 5 && now - lastLungeTime.current > 3000) {
+    //   audioManager.playJumpscare()
+    //   lastLungeTime.current = now
+    //   decreaseHealth(30)
+    //   setTimeout(() => audioManager.playJumpscare(), 200)
+    //   setTimeout(() => audioManager.playJumpscare(), 400)
+    // }
 
     // Enhanced movement patterns based on monster type
     const deltaTime = clock.getDelta()
@@ -217,15 +213,15 @@ export default function Hunter() {
       api.velocity.set(0, hunterPosition.current[1], 0)
     }
 
-    // Check collision with player
-    const distance = Math.sqrt(
-      Math.pow(playerPosition[0] - hunterPosition.current[0], 2) +
-      Math.pow(playerPosition[2] - hunterPosition.current[2], 2)
-    )
+    // Check collision with player - DISABLED for now
+    // const distance = Math.sqrt(
+    //   Math.pow(playerPosition[0] - hunterPosition.current[0], 2) +
+    //   Math.pow(playerPosition[2] - hunterPosition.current[2], 2)
+    // )
 
-    if (distance < 2) {
-      decreaseHealth(0.5)
-    }
+    // if (distance < 2) {
+    //   decreaseHealth(0.5)
+    // }
 
     // Animate head to look at player
     if (headRef.current) {

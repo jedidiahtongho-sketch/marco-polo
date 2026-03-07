@@ -3,10 +3,10 @@ import { Sky } from '@react-three/drei'
 import { Physics } from '@react-three/cannon'
 import Player from './Player'
 import World from './World'
+import Hunter from './Hunter'
 import GameUI from '../UI/GameUI'
-import VirtualJoystick from '../UI/VirtualJoystick'
 import { useGameStore } from '@/store/gameStore'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 interface GameProps {
   onGameOver: () => void
@@ -15,10 +15,11 @@ interface GameProps {
 
 export default function Game({ onGameOver, onGameComplete }: GameProps) {
   const { health, isGameOver, keysCollected, totalKeys, poloCoins, collectedCodes, monsterType } = useGameStore()
-  const [joystickX, setJoystickX] = useState(0)
-  const [joystickY, setJoystickY] = useState(0)
-  const [joystickJump, setJoystickJump] = useState(false)
-  const [joystickPolo, setJoystickPolo] = useState(false)
+  // Joystick variables (currently unused but kept for future mobile support)
+  // const [joystickX, setJoystickX] = useState(0)
+  // const [joystickY, setJoystickY] = useState(0)
+  // const [joystickJump, setJoystickJump] = useState(false)
+  // const [joystickPolo, setJoystickPolo] = useState(false)
 
   useEffect(() => {
     if (isGameOver) {
@@ -62,23 +63,24 @@ export default function Game({ onGameOver, onGameComplete }: GameProps) {
     } */
   }, [])
 
-  const handleJoystickMove = (x: number, y: number) => {
-    console.log('Joystick move:', x, y)
-    setJoystickX(x)
-    setJoystickY(y)
-  }
+  // Joystick handlers (currently unused but kept for future mobile support)
+  // const handleJoystickMove = (x: number, y: number) => {
+  //   console.log('Joystick move:', x, y)
+  //   setJoystickX(x)
+  //   setJoystickY(y)
+  // }
 
-  const handleJoystickJump = () => {
-    console.log('Joystick jump')
-    setJoystickJump(true)
-    setTimeout(() => setJoystickJump(false), 100) // Reset after short delay
-  }
+  // const handleJoystickJump = () => {
+  //   console.log('Joystick jump')
+  //   setJoystickJump(true)
+  //   setTimeout(() => setJoystickJump(false), 100) // Reset after short delay
+  // }
 
-  const handleJoystickPolo = () => {
-    console.log('Joystick polo')
-    setJoystickPolo(true)
-    setTimeout(() => setJoystickPolo(false), 100) // Reset after short delay
-  }
+  // const handleJoystickPolo = () => {
+  //   console.log('Joystick polo')
+  //   setJoystickPolo(true)
+  //   setTimeout(() => setJoystickPolo(false), 100) // Reset after short delay
+  // }
 
   return (
     <>
@@ -120,7 +122,7 @@ export default function Game({ onGameOver, onGameComplete }: GameProps) {
         <Physics gravity={[0, -9.81, 0]}>
           <World onGameComplete={onGameComplete} />
           <Player />
-          {/* <Hunter /> */}
+          <Hunter />
         </Physics>
 
         {/* Camera controls are handled by Player component */}
@@ -151,11 +153,11 @@ export default function Game({ onGameOver, onGameComplete }: GameProps) {
       </Canvas>
       
       <GameUI health={health} keysCollected={keysCollected} totalKeys={totalKeys} poloCoins={poloCoins} collectedCodes={collectedCodes} monsterType={monsterType} />
-      <VirtualJoystick
+      {/* <VirtualJoystick
         onMove={handleJoystickMove}
         onJump={handleJoystickJump}
         onPolo={handleJoystickPolo}
-      />
+      /> */}
     </>
   )
 }

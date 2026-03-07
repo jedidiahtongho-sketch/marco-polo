@@ -15,6 +15,8 @@ export default function Player({}: PlayerProps) {
 
   const setPlayerPosition = useGameStore((state) => state.setPlayerPosition)
   const flashlightOn = useGameStore((state) => state.flashlightOn)
+  const shouldTeleport = useGameStore((state) => state.shouldTeleport)
+  const currentWorld = useGameStore((state) => state.currentWorld)
   
   const [ref, api] = useSphere(() => ({
     mass: 1,
@@ -27,7 +29,6 @@ export default function Player({}: PlayerProps) {
   const velocity = useRef([0, 0, 0])
   const position = useRef([0, 5, 0])
   const flashlightRef = useRef<THREE.SpotLight>(null)
-  const meshRef = useRef<THREE.Mesh>(null)
   const mouse = useRef({ x: 0, y: 0 })
   const isPointerLocked = useRef(false)
 
@@ -124,13 +125,28 @@ export default function Player({}: PlayerProps) {
     api.velocity.set(direction.x, velocity.current[1], direction.z)
 
     if (jump && Math.abs(velocity.current[1]) < 0.05) {
-      api.velocity.set(velocity.current[0], 8, velocity.current[2])
-      console.log('JUMP!')
+      api.velocity.set(velocity.current[0], 4.43, velocity.current[2])
+      console.log('JUMP! (1 meter high)')
     }
 
     // Update player position in store
-    setPlayerPosition(position.current)
+    setPlayerPosition(position.current as [number, number, number])
     camera.position.set(position.current[0], position.current[1] + 1, position.current[2])
+
+    // Check for teleport to different world
+    if (shouldTeleport) {
+      console.log('🌍 TELEPORTING TO DIFFERENT WORLD!')
+      if (currentWorld === 'forest') {
+        // Teleport to forest starting position
+        api.position.set(0, 5, 0)
+      } else {
+        // Teleport to room starting position
+        api.position.set(0, 5, 0)
+      }
+      api.velocity.set(0, 0, 0) // Reset velocity
+      // Reset the teleport flag
+      useGameStore.setState({ shouldTeleport: false })
+    }
 
     // Debug physics occasionally
     if (Math.random() < 0.01) { // Only log 1% of frames
@@ -157,7 +173,7 @@ export default function Player({}: PlayerProps) {
   })
 
   return (
-    <mesh ref={ref}>
+    <mesh ref={ref as any}>
       {/* Player body - visible for debugging */}
       <sphereGeometry args={[0.5, 16, 16]} />
       <meshStandardMaterial 

@@ -13,61 +13,53 @@ type GameState = 'menu' | 'avatar' | 'lobby' | 'matchmaking' | 'loading' | 'play
 function App() {
   const [gameState, setGameState] = useState<GameState>('menu')
 
-  console.log('🎯 APP STATE:', gameState)
-  console.log('LocalStorage check - username:', localStorage.getItem('username'))
-  console.log('LocalStorage check - avatar:', localStorage.getItem('avatar'))
-
-  // Debug state changes
-  useEffect(() => {
-    console.log('🔄 STATE CHANGED TO:', gameState)
-  }, [gameState])
-
-  // Load saved avatar data on mount
+  // Load saved avatar data and audio on mount
   useEffect(() => {
     const savedAvatar = localStorage.getItem('avatar')
     const savedUsername = localStorage.getItem('username')
     
     if (savedAvatar && savedUsername) {
-      // If user has completed avatar setup before, skip to lobby
       setGameState('lobby')
     }
 
-    // Load audio files (will warn if missing)
-    try {
-      audioManager.loadSound('marco', '/audio/marco.mp3', { spatial: true })
-      audioManager.loadSound('polo', '/audio/polo.mp3')
-      audioManager.loadSound('heartbeat', '/audio/heartbeat.mp3', { loop: true })
-      audioManager.loadSound('jumpscare', '/audio/jumpscare.mp3')
-      audioManager.loadSound('whispers', '/audio/whispers.mp3', { loop: true, volume: 0.2 })
-      audioManager.loadSound('distant_screams', '/audio/distant_screams.mp3', { loop: true, volume: 0.1 })
-      audioManager.loadSound('breathing', '/audio/breathing.mp3', { loop: true, volume: 0.3 })
-      console.log('Audio files loaded (or attempted to load)')
-    } catch (error) {
-      console.error('Failed to load audio files:', error)
-    }
+    loadAudioFiles()
   }, [])
 
+  const loadAudioFiles = () => {
+    const audioFiles = [
+      { name: 'marco', path: '/audio/marco.mp3', options: { spatial: true } },
+      { name: 'polo', path: '/audio/polo.mp3' },
+      { name: 'heartbeat', path: '/audio/heartbeat.mp3', options: { loop: true } },
+      { name: 'jumpscare', path: '/audio/jumpscare.mp3' },
+      { name: 'whispers', path: '/audio/whispers.mp3', options: { loop: true, volume: 0.2 } },
+      { name: 'distant_screams', path: '/audio/distant_screams.mp3', options: { loop: true, volume: 0.1 } },
+      { name: 'breathing', path: '/audio/breathing.mp3', options: { loop: true, volume: 0.3 } }
+    ]
+
+    audioFiles.forEach(({ name, path, options = {} }) => {
+      try {
+        audioManager.loadSound(name, path, options)
+      } catch (error) {
+        console.warn(`Failed to load audio file: ${name}`, error)
+      }
+    })
+  }
+
   const handleStartGame = () => {
-    console.log('🚀 STARTING GAME - Current state:', gameState)
-    console.log('🚀 STARTING GAME - Setting state to lobby')
     setGameState('lobby')
-    console.log('🚀 STARTING GAME - State should now be lobby')
   }
 
   const handleAvatarComplete = () => {
     setGameState('lobby')
   }
 
-  const handleLobbyComplete = () => {
-    console.log('🎯 LOBBY COMPLETE - Setting state to loading')
+  const startGameWithLoading = () => {
     setGameState('loading')
-    
-    // Simulate loading time
-    console.log('⏰ Starting 3 second loading timer...')
-    setTimeout(() => {
-      console.log('✅ Loading complete - Setting state to playing')
-      setGameState('playing')
-    }, 3000)
+    setTimeout(() => setGameState('playing'), 3000)
+  }
+
+  const handleLobbyComplete = () => {
+    startGameWithLoading()
   }
 
   const handleBackToMenu = () => {
@@ -75,20 +67,11 @@ function App() {
   }
 
   const handleBackToAvatar = () => {
-
     setGameState('lobby')
   }
 
   const handleMatchmakingComplete = () => {
-    console.log('🎯 MATCHMAKING COMPLETE - Setting state to loading')
-    setGameState('loading')
-    
-    // Simulate loading time
-    console.log('⏰ Starting 3 second loading timer...')
-    setTimeout(() => {
-      console.log('✅ Loading complete - Setting state to playing')
-      setGameState('playing')
-    }, 3000)
+    startGameWithLoading()
   }
 
   return (

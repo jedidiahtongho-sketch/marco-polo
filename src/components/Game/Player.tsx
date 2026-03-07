@@ -125,8 +125,8 @@ export default function Player({}: PlayerProps) {
     api.velocity.set(direction.x, velocity.current[1], direction.z)
 
     if (jump && Math.abs(velocity.current[1]) < 0.05) {
-      api.velocity.set(velocity.current[0], 4.43, velocity.current[2])
-      console.log('JUMP! (1 meter high)')
+      api.velocity.set(velocity.current[0], 10.47, velocity.current[2])
+      console.log('JUMP! (6 feet high)')
     }
 
     // Update player position in store

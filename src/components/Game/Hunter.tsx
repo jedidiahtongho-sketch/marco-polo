@@ -6,7 +6,7 @@ import { audioManager } from '@/audio/AudioManager'
 import * as THREE from 'three'
 
 export default function Hunter() {
-  const { playerPosition, setHunterPosition, monsterType } = useGameStore()
+  const { playerPosition, setHunterPosition, monsterType, monsterAwakened } = useGameStore()
   const [, api] = useSphere(() => ({
     mass: 1,
     type: 'Dynamic',
@@ -80,7 +80,7 @@ export default function Hunter() {
     if (now - lastMarcoCall.current > marcoInterval.current) {
       audioManager.playScaryMarco([hunterPosition.current[0], hunterPosition.current[1], hunterPosition.current[2]])
       lastMarcoCall.current = now
-      marcoInterval.current = 3000 + Math.random() * 4000 // More frequent scary calls
+      marcoInterval.current = monsterAwakened ? 1000 + Math.random() * 1000 : 3000 + Math.random() * 4000 // AWAKENED: Every 1-2 seconds vs normal 3-7 seconds
     }
 
     // Terrifying heartbeat based on distance to player
@@ -115,31 +115,34 @@ export default function Hunter() {
     }
 
     let targetPosition = [playerPosition[0], playerPosition[1], playerPosition[2]]
-    let speed = 8 // Increased from 2 - much faster approach
+    let speed = monsterAwakened ? 15 : 8 // AWAKENED: Extremely fast (15) vs normal (8)
 
     // Apply movement pattern
     switch (movementPattern.current) {
       case 'direct':
         // Direct pursuit - original behavior
+        if (monsterAwakened) {
+          speed = 18 // AWAKENED: Even faster direct pursuit
+        }
         break
 
       case 'circle':
         // Circle around player at distance
-        const circleRadius = 8
-        const circleSpeed = 6 // Increased from 1.5 - much faster circling
+        const circleRadius = monsterAwakened ? 4 : 8 // AWAKENED: Much closer circling
+        const circleSpeed = monsterAwakened ? 12 : 6 // AWAKENED: Much faster circling
         circleAngle.current += circleSpeed * deltaTime
         targetPosition = [
           playerPosition[0] + Math.cos(circleAngle.current) * circleRadius,
           playerPosition[1],
           playerPosition[2] + Math.sin(circleAngle.current) * circleRadius
         ]
-        speed = 7 // Increased from 1.8 - much faster hiding
+        speed = monsterAwakened ? 14 : 7 // AWAKENED: Much faster circling
         break
 
       case 'zigzag':
         // Zigzag movement toward player
-        const zigzagSpeed = 12 // Increased from 3 - extremely fast zigzag
-        const zigzagAmplitude = 4
+        const zigzagSpeed = monsterAwakened ? 24 : 12 // AWAKENED: Extremely fast zigzag
+        const zigzagAmplitude = monsterAwakened ? 2 : 4 // AWAKENED: Tighter zigzag
         zigzagDirection.current += zigzagSpeed * deltaTime
         const zigzagOffset = Math.sin(zigzagDirection.current) * zigzagAmplitude
         targetPosition = [
@@ -147,7 +150,7 @@ export default function Hunter() {
           playerPosition[1],
           playerPosition[2]
         ]
-        speed = 9 // Increased from 2.2 - much faster hide approach
+        speed = monsterAwakened ? 16 : 9 // AWAKENED: Much faster zigzag
         break
 
       case 'hide':
@@ -432,7 +435,7 @@ export default function Hunter() {
           <meshStandardMaterial
             color="#8B0000"
             emissive="#8B0000"
-            emissiveIntensity={0.2}
+            emissiveIntensity={monsterAwakened ? 0.8 : 0.2}
             roughness={0.8}
             metalness={0.1}
           />
@@ -445,7 +448,7 @@ export default function Hunter() {
           <meshStandardMaterial
             color="#FF0000"
             emissive="#FF0000"
-            emissiveIntensity={2.0}
+            emissiveIntensity={monsterAwakened ? 5.0 : 2.0}
           />
         </mesh>
         {/* Right eye */}
@@ -454,7 +457,7 @@ export default function Hunter() {
           <meshStandardMaterial
             color="#FF0000"
             emissive="#FF0000"
-            emissiveIntensity={2.0}
+            emissiveIntensity={monsterAwakened ? 5.0 : 2.0}
           />
         </mesh>
 
@@ -464,7 +467,7 @@ export default function Hunter() {
           <meshStandardMaterial
             color="#FFFFFF"
             emissive="#FFFFFF"
-            emissiveIntensity={3.0}
+            emissiveIntensity={monsterAwakened ? 8.0 : 3.0}
           />
         </mesh>
         <mesh position={[0.12, 0.05, 0.32]} castShadow>
@@ -472,7 +475,7 @@ export default function Hunter() {
           <meshStandardMaterial
             color="#FFFFFF"
             emissive="#FFFFFF"
-            emissiveIntensity={3.0}
+            emissiveIntensity={monsterAwakened ? 8.0 : 3.0}
           />
         </mesh>
 

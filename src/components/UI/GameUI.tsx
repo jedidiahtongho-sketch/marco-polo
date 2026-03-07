@@ -8,9 +8,12 @@ interface GameUIProps {
   poloCoins: number
   collectedCodes: string[]
   monsterType: string
+  currentWorld: 'room' | 'forest' | 'dungeon'
+  roomTimeLeft: number
+  leviathanActive: boolean
 }
 
-export default function GameUI({ health, keysCollected, totalKeys, poloCoins, collectedCodes, monsterType }: GameUIProps) {
+export default function GameUI({ health, keysCollected, totalKeys, poloCoins, collectedCodes, monsterType, currentWorld, roomTimeLeft, leviathanActive }: GameUIProps) {
   const flashlightOn = useGameStore((state) => state.flashlightOn)
   const toggleFlashlight = useGameStore((state) => state.toggleFlashlight)
   const getMonsterTip = (type: string) => {
@@ -45,6 +48,41 @@ export default function GameUI({ health, keysCollected, totalKeys, poloCoins, co
           </div>
         </div>
       </div>
+
+      {/* Room Timer - Only show in room world */}
+      {currentWorld === 'room' && (
+        <div className="absolute top-4 left-72">
+          <div className={`bg-gray-900 bg-opacity-80 p-4 rounded-lg border-2 ${leviathanActive ? 'border-red-500 animate-pulse' : 'border-blue-500'}`}>
+            <p className="text-white text-sm mb-2">Escape Time</p>
+            <div className="flex items-center space-x-2">
+              <span className={`text-2xl ${leviathanActive ? 'text-red-400' : roomTimeLeft <= 10 ? 'text-red-400 animate-pulse' : 'text-blue-400'}`}>
+                {leviathanActive ? '🐙' : '⏰'}
+              </span>
+              <span className={`text-lg font-bold ${leviathanActive ? 'text-red-400' : roomTimeLeft <= 10 ? 'text-red-400' : 'text-blue-400'}`}>
+                {roomTimeLeft}s
+              </span>
+            </div>
+            {leviathanActive && (
+              <motion.p
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-red-400 text-xs mt-1 font-semibold"
+              >
+                LEVIATHAN ATTACKING!
+              </motion.p>
+            )}
+            {roomTimeLeft <= 10 && !leviathanActive && (
+              <motion.p
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-red-400 text-xs mt-1 font-semibold animate-pulse"
+              >
+                TIME RUNNING OUT!
+              </motion.p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Flashlight Toggle */}
       <div className="absolute top-32 left-4">

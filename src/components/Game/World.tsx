@@ -619,13 +619,14 @@ function FruitTree({ position, type }: { position: [number, number, number], typ
 }
 
 function ExitDoor({ position }: any) {
-  const { keysCollected, totalKeys, bonesCollected, totalBones, grapeVinesCollected, totalGrapeVines, teleportPlayer, setCurrentWorld, currentWorld, setGameComplete } = useGameStore()
+  const { keysCollected, totalKeys, bonesCollected, totalBones, grapeVinesCollected, totalGrapeVines, crownsCollected, totalCrowns, teleportPlayer, setCurrentWorld, currentWorld, setGameComplete } = useGameStore()
   const [isShaking, setIsShaking] = useState(false)
   const glowIntensity = 0.5 // Fixed glow intensity
 
   const getRequiredCollectibles = () => {
     if (currentWorld === 'kennel') return { collected: bonesCollected, total: totalBones, name: 'bones' }
     if (currentWorld === 'orchard') return { collected: grapeVinesCollected, total: totalGrapeVines, name: 'grape vines' }
+    if (currentWorld === 'castle') return { collected: crownsCollected, total: totalCrowns, name: 'crowns' }
     return { collected: keysCollected, total: totalKeys, name: 'keys' }
   }
 
@@ -646,16 +647,18 @@ function ExitDoor({ position }: any) {
     } else if (currentWorld === 'forest') {
       setCurrentWorld('dungeon')
     } else if (currentWorld === 'dungeon') {
-      setCurrentWorld('cave')
-    } else if (currentWorld === 'cave') {
       setCurrentWorld('kennel')
     } else if (currentWorld === 'kennel') {
       // Blue door to orchard!
       console.log('🔵 BLUE DOOR APPEARS! Teleporting to STAGE 5 - THE ORCHARD!')
       setCurrentWorld('orchard')
     } else if (currentWorld === 'orchard') {
+      // Purple door to castle!
+      console.log('🟣 PURPLE DOOR APPEARS! Teleporting to STAGE 6 - THE CASTLE!')
+      setCurrentWorld('castle')
+    } else if (currentWorld === 'castle') {
       // Game completed!
-      console.log('🏆 GAME COMPLETED! All grape vines collected!')
+      console.log('🏆 GAME COMPLETED! All crowns collected!')
       setGameComplete(true)
     } else {
       setCurrentWorld('room')
@@ -712,9 +715,9 @@ function ExitDoor({ position }: any) {
               CLICK TO TELEPORT TO {
                 currentWorld === 'room' ? 'STAGE 2 - FOREST' : 
                 currentWorld === 'forest' ? 'STAGE 3 - DUNGEON' :
-                currentWorld === 'dungeon' ? 'STAGE 4 - CAVE' :
-                currentWorld === 'cave' ? 'STAGE 5 - KENNEL' :
-                currentWorld === 'kennel' ? 'STAGE 6 - ORCHARD' :
+                currentWorld === 'dungeon' ? 'STAGE 4 - KENNEL' :
+                currentWorld === 'kennel' ? 'STAGE 5 - ORCHARD' :
+                currentWorld === 'orchard' ? 'STAGE 6 - CASTLE' :
                 'VICTORY!'
               }!
             </div>
@@ -1531,11 +1534,13 @@ function KennelStructure({ position, size, color, type }: any) {
 }
 
 export default function World({ onGameComplete }: { onGameComplete: () => void }) {
-  const { keysCollected, collectKey, totalKeys, poloCoinsCollected, collectPoloCoin, currentWorld, planksCollected, collectPlank, blackDoorVisible, crystalsCollected, collectCrystal, bonesCollected, collectBone, grapeVinesCollected, collectGrapeVine, setGameComplete, totalBones, totalGrapeVines } = useGameStore()
+  const { keysCollected, collectKey, totalKeys, poloCoinsCollected, collectPoloCoin, currentWorld, planksCollected, collectPlank, blackDoorVisible, crystalsCollected, collectCrystal, bonesCollected, collectBone, grapeVinesCollected, collectGrapeVine, setGameComplete, totalBones, totalGrapeVines, crownsCollected, collectCrown, totalCrowns } = useGameStore()
   const [keyPositions] = useState(() => generateBoxPositions())
   const [poloCoinPositions] = useState(() => generatePoloCoinPositions())
+  const [tablePositions] = useState(() => [{ x: -8, y: 0.5, z: 2 }]) // Single table position
 
   console.log('🌍 World component rendering, currentWorld:', currentWorld)
+  console.log('🚨 DEBUG: World component is executing!')
 
   const groundRef = useRef<THREE.Mesh>(null)
   usePlane(() => ({
@@ -1545,6 +1550,12 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
 
   return (
     <>
+      {/* DEBUG: Bright red cube to verify World component is rendering */}
+      <mesh position={[0, 2, 0]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial color="#ff0000" />
+      </mesh>
+
       {/* TERRIFYING FOG - makes everything mysterious and scary */}
       <fog attach="fog" args={
         currentWorld === 'room' ? ['#1a0a0a', 5, 25] : 
@@ -1603,10 +1614,20 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
             metalness={0.0}
           />
         </mesh>
-      ) : (
-        // Kennel ground - dirt and grass
+      ) : currentWorld === 'castle' ? (
+        // Castle ground - stone courtyard
         <mesh ref={groundRef} receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-          <planeGeometry args={[120, 120]} />
+          <planeGeometry args={[100, 100]} />
+          <meshStandardMaterial
+            color="#696969"
+            roughness={0.9}
+            metalness={0.1}
+          />
+        </mesh>
+      ) : (
+        // Kennel ground - dirt and grass (very large)
+        <mesh ref={groundRef} receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+          <planeGeometry args={[250, 250]} />
           <meshStandardMaterial
             color="#8B4513"
             roughness={0.9}
@@ -1624,18 +1645,22 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
           ))}
 
           {/* Furniture */}
-          {generateFurniture().map((item, i) => {
-            if (item.type === 'table') {
-              return <RealisticTable key={i} position={item.position as [number, number, number]} />
-            } else if (item.type === 'bookshelf') {
-              return <RealisticBookshelf key={i} position={item.position as [number, number, number]} />
-            } else if (item.type === 'bed') {
-              return <RealisticBed key={i} position={item.position as [number, number, number]} />
-            } else if (item.type === 'couch') {
-              return <RealisticCouch key={i} position={item.position as [number, number, number]} />
-            } else {
-              return <Furniture key={i} {...item} />
-            }
+          {(() => {
+            const furniture = generateFurniture()
+            console.log('🏠 Furniture generated:', furniture)
+            return furniture.map((item, i) => {
+              console.log('🪑 Processing furniture item:', item)
+              if (item.type === 'bookshelf') {
+                return <RealisticBookshelf key={i} position={item.position as [number, number, number]} />
+              } else if (item.type === 'bed') {
+                return <RealisticBed key={i} position={item.position as [number, number, number]} />
+              } else if (item.type === 'couch') {
+                return <RealisticCouch key={i} position={item.position as [number, number, number]} />
+              } else if (item.type !== 'table') { // Exclude tables since they're rendered separately
+                return <Furniture key={i} {...item} />
+              }
+              return null
+            })
           })}
         </>
       )}
@@ -1715,6 +1740,21 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
         </>
       )}
 
+      {/* Castle-specific elements */}
+      {currentWorld === 'castle' && (
+        <>
+          {/* Castle walls */}
+          {/* {generateCastleWalls().map((wall, i) => (
+            <Wall key={i} position={wall.position} size={wall.size} />
+          ))} */}
+
+          {/* Castle towers */}
+          {/* {generateCastleTowers().map((tower, i) => (
+            <CastleTower key={i} position={tower.position} height={tower.height} />
+          ))} */}
+        </>
+      )}
+
       {/* Collectibles - Boxes in room, Planks in forest, Treasures in dungeon, Crystals in cave, Bones in kennel */}
       {currentWorld === 'room' ? (
         keyPositions.map((keyPos, i) => (
@@ -1770,6 +1810,9 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
             onCollect={() => collectGrapeVine()}
           />
         ))
+      ) : currentWorld === 'castle' ? (
+        // Castle crowns - temporarily disabled
+        <></>
       ) : (
         // Default to room boxes
         keyPositions.map((keyPos, i) => (
@@ -1792,10 +1835,19 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
         />
       ))}
 
+      {/* Tables */}
+      {tablePositions.map((tablePos, i) => (
+        <RealisticTable
+          key={`table-${i}`}
+          position={[tablePos.x, tablePos.y, tablePos.z]}
+        />
+      ))}
+
       {/* Exit door - only visible when all required collectibles collected */}
       {((currentWorld === 'room' || currentWorld === 'dungeon') && keysCollected >= totalKeys) ||
        (currentWorld === 'kennel' && bonesCollected >= totalBones) ||
-       (currentWorld === 'orchard' && grapeVinesCollected >= totalGrapeVines) && (
+       (currentWorld === 'orchard' && grapeVinesCollected >= totalGrapeVines) ||
+       (currentWorld === 'castle' && crownsCollected >= totalCrowns) && (
         <ExitDoor position={[8, 2, 3]} onGameComplete={onGameComplete} />
       )}
 
@@ -1816,12 +1868,14 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
           currentWorld === 'room' ? 0.02 : 
           currentWorld === 'forest' ? 0.1 : 
           currentWorld === 'orchard' ? 0.15 :
+          currentWorld === 'castle' ? 0.08 :
           0.01 // Dungeon - extremely dark
         } 
         color={
           currentWorld === 'room' ? "#330000" : 
           currentWorld === 'forest' ? "#4a7c59" : 
           currentWorld === 'orchard' ? "#228B22" :
+          currentWorld === 'castle' ? "#FFD700" :
           "#1a0033" // Dungeon - deep purple/black
         } 
       />

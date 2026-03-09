@@ -31,6 +31,11 @@ export default function Player({}: PlayerProps) {
   const flashlightRef = useRef<THREE.SpotLight>(null)
   const mouse = useRef({ x: 0, y: 0 })
   const isPointerLocked = useRef(false)
+  
+  // Jump system
+  const jumpCount = useRef(0)
+  const lastJumpTime = useRef(0)
+  const jumpCooldown = 5000 // 5 seconds in milliseconds
 
   // Subscribe to physics body changes
   useEffect(() => {
@@ -124,9 +129,28 @@ export default function Player({}: PlayerProps) {
     // Apply movement velocity
     api.velocity.set(direction.x, velocity.current[1], direction.z)
 
-    if (jump && Math.abs(velocity.current[1]) < 0.05) {
-      api.velocity.set(velocity.current[0], 10.47, velocity.current[2])
-      console.log('JUMP! (6 feet high)')
+    // Double jump system with 5-second cooldown
+    const currentTime = Date.now()
+    const timeSinceLastJump = currentTime - lastJumpTime.current
+    
+    if (jump && timeSinceLastJump >= jumpCooldown) {
+      // Reset jump count if on ground (velocity close to 0)
+      if (Math.abs(velocity.current[1]) < 0.05) {
+        jumpCount.current = 0
+      }
+      
+      // Allow up to 2 jumps
+      if (jumpCount.current < 2) {
+        api.velocity.set(velocity.current[0], 10.47, velocity.current[2])
+        jumpCount.current++
+        lastJumpTime.current = currentTime
+        console.log(`JUMP ${jumpCount.current}/2! (6 feet high)`)
+      }
+    }
+    
+    // Reset jump count when landing on ground
+    if (Math.abs(velocity.current[1]) < 0.05 && jumpCount.current > 0 && timeSinceLastJump > 1000) {
+      jumpCount.current = 0
     }
 
     // Update player position in store
@@ -144,6 +168,9 @@ export default function Player({}: PlayerProps) {
         api.position.set(0, 5, 0)
       }
       api.velocity.set(0, 0, 0) // Reset velocity
+      // Reset jump system
+      jumpCount.current = 0
+      lastJumpTime.current = 0
       // Reset the teleport flag
       useGameStore.setState({ shouldTeleport: false })
     }

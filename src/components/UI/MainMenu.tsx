@@ -64,7 +64,7 @@ export default function MainMenu({ onStart }: MainMenuProps) {
           }}
           transition={{ duration: 2, repeat: Infinity }}
         >
-          MARCO'S CURSE
+          MARCO POLO
         </motion.h1>
         
         <motion.p

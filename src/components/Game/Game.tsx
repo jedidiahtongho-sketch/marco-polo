@@ -14,6 +14,8 @@ interface GameProps {
 }
 
 export default function Game({ onGameOver, onGameComplete }: GameProps) {
+  console.log('🎮 Game component FUNCTION CALLED! Props:', { onGameOver, onGameComplete })
+
   const { 
     isGameOver, 
     isGameComplete,
@@ -30,6 +32,8 @@ export default function Game({ onGameOver, onGameComplete }: GameProps) {
     collectedCodes,
     monsterType
   } = useGameStore()
+
+  console.log('🎯 Game component - currentWorld:', currentWorld)
 
   // Room timer logic - only active in room world
   useEffect(() => {
@@ -76,6 +80,7 @@ export default function Game({ onGameOver, onGameComplete }: GameProps) {
 
   return (
     <>
+      {console.log('🎨 Game component JSX rendering...')}
       <Canvas
         shadows={false} // Temporarily disable shadows to reduce GPU load
         camera={{ fov: 75, near: 0.1, far: 1000 }}
@@ -92,6 +97,9 @@ export default function Game({ onGameOver, onGameComplete }: GameProps) {
           canvas.addEventListener('webglcontextrestored', () => {
             console.log('✅ WebGL context restored')
           })
+        }}
+        onError={(error) => {
+          console.error('❌ Canvas error:', error)
         }}
       >
         <Sky sunPosition={[100, 20, 100]} />

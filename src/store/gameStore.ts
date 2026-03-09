@@ -22,7 +22,7 @@ interface GameState {
   doorUnlockRequired: number
   shouldTeleport: boolean
   isGameComplete: boolean
-  currentWorld: 'room' | 'forest' | 'dungeon' | 'cave' | 'kennel' | 'orchard'
+  currentWorld: 'room' | 'forest' | 'dungeon' | 'cave' | 'kennel' | 'orchard' | 'castle'
   monsterAwakened: boolean
   planksCollected: number
   totalPlanks: number
@@ -38,6 +38,8 @@ interface GameState {
   totalBones: number
   grapeVinesCollected: number
   totalGrapeVines: number
+  crownsCollected: number
+  totalCrowns: number
   
   setHealth: (health: number) => void
   decreaseHealth: (amount: number) => void
@@ -58,7 +60,7 @@ interface GameState {
   incrementDoorUnlockAttempt: () => void
   resetDoorUnlock: () => void
   teleportPlayer: () => void
-  setCurrentWorld: (world: 'room' | 'forest' | 'dungeon' | 'cave' | 'kennel' | 'orchard') => void
+  setCurrentWorld: (world: 'room' | 'forest' | 'dungeon' | 'cave' | 'kennel' | 'orchard' | 'castle') => void
   awakenMonster: () => void
   collectPlank: () => void
   showBlackDoor: () => void
@@ -70,6 +72,7 @@ interface GameState {
   collectCrystal: () => void
   collectBone: () => void
   collectGrapeVine: () => void
+  collectCrown: () => void
   reset: () => void
 }
 
@@ -108,9 +111,11 @@ const initialState = {
   crystalsCollected: 0,
   totalCrystals: 8,
   bonesCollected: 0,
-  totalBones: 9,
+  totalBones: 6,
   grapeVinesCollected: 0,
   totalGrapeVines: 10,
+  crownsCollected: 0,
+  totalCrowns: 12,
   canJump: () => false,
   recordJump: () => {},
 }
@@ -219,12 +224,13 @@ export const useGameStore = create<GameState>((set) => ({
     currentWorld: world,
     isGameOver: false,
     isGameComplete: false,
-    keysCollected: world === 'forest' ? 0 : world === 'dungeon' ? 0 : world === 'cave' ? 0 : world === 'kennel' ? 0 : world === 'orchard' ? 0 : 0, // Reset keys when entering new worlds
-    totalKeys: world === 'forest' ? 7 : world === 'dungeon' ? 10 : world === 'cave' ? 8 : world === 'kennel' ? 9 : world === 'orchard' ? 10 : 5, // 7 planks in forest, 10 treasures in dungeon, 8 crystals in cave, 9 bones in kennel, 10 grape vines in orchard, 5 boxes in room
+    keysCollected: world === 'forest' ? 0 : world === 'dungeon' ? 0 : world === 'cave' ? 0 : world === 'kennel' ? 0 : world === 'orchard' ? 0 : world === 'castle' ? 0 : 0, // Reset keys when entering new worlds
+    totalKeys: world === 'forest' ? 7 : world === 'dungeon' ? 10 : world === 'cave' ? 8 : world === 'kennel' ? 9 : world === 'orchard' ? 10 : world === 'castle' ? 12 : 5, // 7 planks in forest, 10 treasures in dungeon, 8 crystals in cave, 9 bones in kennel, 10 grape vines in orchard, 12 crowns in castle, 5 boxes in room
     planksCollected: world === 'forest' ? 0 : 0,
     crystalsCollected: world === 'cave' ? 0 : 0,
     bonesCollected: world === 'kennel' ? 0 : 0,
     grapeVinesCollected: world === 'orchard' ? 0 : 0,
+    crownsCollected: world === 'castle' ? 0 : 0,
   }),
   
   awakenMonster: () => set({ monsterAwakened: true }),
@@ -269,6 +275,11 @@ export const useGameStore = create<GameState>((set) => ({
   collectGrapeVine: () => set((state) => ({
     grapeVinesCollected: state.grapeVinesCollected + 1,
     score: state.score + 300
+  })),
+  
+  collectCrown: () => set((state) => ({
+    crownsCollected: state.crownsCollected + 1,
+    score: state.score + 350
   })),
   
   reset: () => set(initialState),

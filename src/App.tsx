@@ -22,10 +22,20 @@ function App() {
     const savedUsername = localStorage.getItem('username')
 
     if (savedAvatar && savedUsername) {
+      console.log('📋 Found saved data, going to lobby')
       setGameState('lobby')
+    } else {
+      console.log('❌ No saved data, staying in menu')
     }
 
     loadAudioFiles()
+
+    // TEMPORARY: Auto-start game for testing
+    console.log('🚀 TEMPORARY: Auto-starting game in 1 second...')
+    setTimeout(() => {
+      console.log('🎮 Auto-transitioning to playing state')
+      setGameState('playing')
+    }, 1000)
   }, [])
 
   const loadAudioFiles = () => {
@@ -61,8 +71,12 @@ function App() {
   }
 
   const startGameWithLoading = () => {
+    console.log('⏳ Starting loading screen...')
     setGameState('loading')
-    setTimeout(() => setGameState('playing'), 3000)
+    setTimeout(() => {
+      console.log('🎮 Transitioning to playing state!')
+      setGameState('playing')
+    }, 3000)
   }
 
   const handleLobbyComplete = () => {
@@ -116,7 +130,10 @@ function App() {
       )}
       
       {gameState === 'playing' && (
-        <Game onGameOver={handleBackToMenu} onGameComplete={handleBackToMenu} />
+        <>
+          {console.log('🎮 App: About to render Game component')}
+          <Game onGameOver={handleBackToMenu} onGameComplete={handleBackToMenu} />
+        </>
       )}
     </div>
   )

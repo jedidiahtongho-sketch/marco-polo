@@ -77,20 +77,29 @@ export default function Game({ onGameOver, onGameComplete }: GameProps) {
   return (
     <>
       <Canvas
-        shadows
+        shadows={false} // Temporarily disable shadows to reduce GPU load
         camera={{ fov: 75, near: 0.1, far: 1000 }}
         className="w-full h-full"
         style={{ width: '100vw', height: '100vh', background: '#1a1a2a' }}
+        onCreated={({ gl }) => {
+          console.log('🎨 Canvas created, WebGL context:', gl)
+          // Add context loss/restore handlers
+          const canvas = gl.domElement
+          canvas.addEventListener('webglcontextlost', (event) => {
+            console.error('❌ WebGL context lost!', event)
+            event.preventDefault()
+          })
+          canvas.addEventListener('webglcontextrestored', () => {
+            console.log('✅ WebGL context restored')
+          })
+        }}
       >
         <Sky sunPosition={[100, 20, 100]} />
-        <ambientLight intensity={1.0} color="#ffffff" />
+        <ambientLight intensity={0.5} color="#ffffff" />
         <directionalLight
           position={[10, 10, 5]}
-          intensity={1.0}
+          intensity={0.5}
           color="#ffffff"
-          castShadow
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
         />
         <Physics gravity={[0, -30, 0]}>
           <Player />

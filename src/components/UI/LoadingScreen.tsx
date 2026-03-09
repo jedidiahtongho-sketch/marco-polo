@@ -17,6 +17,8 @@ export default function LoadingScreen({ onSkip }: LoadingScreenProps) {
       onClick={handleSkip}
     >
       {/* Relantro Helper */}
+      {/* Relantro Helper - Commented out due to missing file */}
+      {/*
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -26,13 +28,13 @@ export default function LoadingScreen({ onSkip }: LoadingScreenProps) {
           src="/logos/relantro-helper.svg"
           alt="Relantro Helper"
           className="w-14 h-14 opacity-80 drop-shadow-2xl relative z-10"
-          animate={{ 
+          animate={{
             rotate: [0, 360],
             scale: [1, 1.1, 1]
           }}
           transition={{ duration: 3, repeat: Infinity }}
         />
-        {/* 4D Dimensional rifts */}
+        // 4D Dimensional rifts
         <div className="absolute inset-0 pointer-events-none">
           <motion.div
             className="absolute top-1 left-1 w-0.5 h-4 bg-cyan-400 opacity-60"
@@ -52,6 +54,7 @@ export default function LoadingScreen({ onSkip }: LoadingScreenProps) {
         </div>
         <div className="absolute inset-0 bg-red-600/20 rounded-full blur-xl animate-pulse"></div>
       </motion.div>
+      */}
       <div className="text-center">
         <motion.div
           animate={{ rotate: 360 }}

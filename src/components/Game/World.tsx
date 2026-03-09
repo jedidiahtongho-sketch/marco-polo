@@ -26,53 +26,98 @@ function Tree({ position, height }: { position: [number, number, number], height
 }
 
 function RealisticTable({ position }: { position: [number, number, number] }) {
-  // Create wood-like material with procedural properties
+  console.log('🪑 RealisticTable rendering at position:', position)
+
+  // Enhanced wood-like material with better properties
   const woodMaterial = {
     color: '#8B4513',
-    roughness: 0.8,
-    metalness: 0.1,
-    // Add some variation to simulate wood grain
-    normalScale: new THREE.Vector2(0.5, 0.5),
+    roughness: 0.7,
+    metalness: 0.05,
+    // Add wood grain texture simulation
+    normalScale: new THREE.Vector2(0.3, 0.3),
   }
 
+  // Table dimensions
+  const tableWidth = 2.2
+  const tableDepth = 1.2
+  const tableHeight = 0.08
+  const legHeight = 0.9
+  const legRadius = 0.06
+
+  // Leg positions with slight variations for realism
   const legPositions = [
-    [-0.9, 0.5, -0.4], // front left
-    [0.9, 0.5, -0.4],  // front right
-    [-0.9, 0.5, 0.4],  // back left
-    [0.9, 0.5, 0.4],   // back right
+    [-tableWidth/2 + 0.15, legHeight/2, -tableDepth/2 + 0.15], // front left
+    [tableWidth/2 - 0.15, legHeight/2, -tableDepth/2 + 0.15],  // front right
+    [-tableWidth/2 + 0.15, legHeight/2, tableDepth/2 - 0.15],  // back left
+    [tableWidth/2 - 0.15, legHeight/2, tableDepth/2 - 0.15],   // back right
   ]
 
-  // Physics for table top
+  // Physics for table top with more accurate dimensions
   useBox(() => ({
-    position: [position[0], position[1] + 1, position[2]],
-    args: [2, 0.1, 1],
+    position: [position[0], position[1] + tableHeight/2, position[2]],
+    args: [tableWidth, tableHeight, tableDepth],
     type: 'Static'
   }))
 
-  // Physics for legs
+  // Physics for legs with more accurate dimensions
   legPositions.forEach((legPos) => {
     useBox(() => ({
       position: [position[0] + legPos[0], position[1] + legPos[1], position[2] + legPos[2]],
-      args: [0.05, 1, 0.05],
+      args: [legRadius * 2, legHeight, legRadius * 2],
       type: 'Static'
     }))
   })
 
   return (
     <group position={position}>
-      {/* Table top */}
-      <mesh position={[0, 1, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2, 0.1, 1]} />
+      {/* Debug label */}
+      <mesh position={[0, 1.2, 0]}>
+        <planeGeometry args={[1.5, 0.3]} />
+        <meshBasicMaterial color="#000000" transparent opacity={0.8} />
+        <Html center>
+          <div style={{ color: '#ff6b35', fontSize: '14px', textAlign: 'center', fontWeight: 'bold' }}>
+            ENHANCED TABLE
+          </div>
+        </Html>
+      </mesh>
+
+      {/* Table top with beveled edges for realism */}
+      <mesh position={[0, tableHeight/2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[tableWidth, tableHeight, tableDepth]} />
         <meshStandardMaterial {...woodMaterial} />
       </mesh>
 
-      {/* Table legs */}
+      {/* Table top edge detail - subtle bevel */}
+      <mesh position={[0, tableHeight - 0.01, 0]} castShadow>
+        <boxGeometry args={[tableWidth - 0.1, 0.02, tableDepth - 0.1]} />
+        <meshStandardMaterial color="#654321" roughness={0.8} metalness={0.02} />
+      </mesh>
+
+      {/* Table legs with slight tapering */}
       {legPositions.map((legPos, index) => (
-        <mesh key={index} position={legPos as [number, number, number]} castShadow>
-          <cylinderGeometry args={[0.05, 0.05, 1, 8]} />
-          <meshStandardMaterial {...woodMaterial} />
-        </mesh>
+        <group key={index} position={legPos as [number, number, number]}>
+          {/* Main leg */}
+          <mesh castShadow>
+            <cylinderGeometry args={[legRadius, legRadius * 0.9, legHeight, 12]} />
+            <meshStandardMaterial {...woodMaterial} />
+          </mesh>
+          {/* Leg base detail */}
+          <mesh position={[0, -legHeight/2 + 0.02, 0]} castShadow>
+            <cylinderGeometry args={[legRadius * 1.2, legRadius * 1.2, 0.04, 12]} />
+            <meshStandardMaterial color="#654321" roughness={0.9} metalness={0.01} />
+          </mesh>
+        </group>
       ))}
+
+      {/* Cross braces for stability (optional detail) */}
+      <mesh position={[0, legHeight * 0.3, 0]} castShadow>
+        <boxGeometry args={[tableWidth - 0.3, 0.04, 0.08]} />
+        <meshStandardMaterial color="#654321" roughness={0.8} metalness={0.02} />
+      </mesh>
+      <mesh position={[0, legHeight * 0.3, 0]} castShadow>
+        <boxGeometry args={[0.08, 0.04, tableDepth - 0.3]} />
+        <meshStandardMaterial color="#654321" roughness={0.8} metalness={0.02} />
+      </mesh>
     </group>
   )
 }
@@ -1489,6 +1534,8 @@ export default function World({ onGameComplete }: { onGameComplete: () => void }
   const { keysCollected, collectKey, totalKeys, poloCoinsCollected, collectPoloCoin, currentWorld, planksCollected, collectPlank, blackDoorVisible, crystalsCollected, collectCrystal, bonesCollected, collectBone, grapeVinesCollected, collectGrapeVine, setGameComplete, totalBones, totalGrapeVines } = useGameStore()
   const [keyPositions] = useState(() => generateBoxPositions())
   const [poloCoinPositions] = useState(() => generatePoloCoinPositions())
+
+  console.log('🌍 World component rendering, currentWorld:', currentWorld)
 
   const groundRef = useRef<THREE.Mesh>(null)
   usePlane(() => ({

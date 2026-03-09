@@ -78,7 +78,8 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
   if (step === 'avatar') {
     return (
       <div className="relative flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-black via-gray-900 to-blood-900 p-8">
-        {/* Relantro Helper */}
+        {/* Relantro Helper - Commented out due to missing file */}
+        {/*
         <motion.div className="absolute top-4 right-4 relative">
           <motion.img
             src="/logos/relantro-helper.svg"
@@ -90,7 +91,7 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
             }}
             transition={{ duration: 4, repeat: Infinity }}
           />
-          {/* 4D Dimensional rifts */}
+          // 4D Dimensional rifts
           <div className="absolute inset-0 pointer-events-none">
             <motion.div
               className="absolute top-1 left-1 w-0.5 h-3 bg-cyan-400 opacity-60"
@@ -110,6 +111,7 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
           </div>
           <div className="absolute inset-0 bg-red-600/10 rounded-full blur-xl animate-pulse"></div>
         </motion.div>
+        */}
         <motion.h1
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -300,7 +302,8 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
   if (step === 'account') {
     return (
       <div className="relative flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-black via-gray-900 to-blood-900 p-8">
-        {/* Relantro Helper */}
+        {/* Relantro Helper - Commented out due to missing file */}
+        {/*
         <motion.div className="absolute top-4 right-4 relative">
           <motion.img
             src="/logos/relantro-helper.svg"
@@ -312,7 +315,7 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
             }}
             transition={{ duration: 3, repeat: Infinity }}
           />
-          {/* 4D Dimensional rifts */}
+          // 4D Dimensional rifts
           <div className="absolute inset-0 pointer-events-none">
             <motion.div
               className="absolute top-1 left-1 w-0.5 h-3 bg-cyan-400 opacity-60"
@@ -332,6 +335,7 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
           </div>
           <div className="absolute inset-0 bg-red-600/10 rounded-full blur-xl animate-pulse"></div>
         </motion.div>
+        */}
         <motion.h1
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -396,7 +400,8 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
   if (step === 'friendCode') {
     return (
       <div className="relative flex flex-col items-center justify-center w-full h-full bg-gradient-to-b from-black via-gray-900 to-blood-900 p-8">
-        {/* Relantro Helper */}
+        {/* Relantro Helper - Commented out due to missing file */}
+        {/*
         <motion.div className="absolute top-4 right-4 relative">
           <motion.img
             src="/logos/relantro-helper.svg"
@@ -408,7 +413,7 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
             }}
             transition={{ duration: 5, repeat: Infinity }}
           />
-          {/* 4D Dimensional rifts */}
+          // 4D Dimensional rifts
           <div className="absolute inset-0 pointer-events-none">
             <motion.div
               className="absolute top-1 left-1 w-0.5 h-3 bg-cyan-400 opacity-60"
@@ -428,6 +433,7 @@ export default function AvatarSelection({ onComplete, onBack }: AvatarSelectionP
           </div>
           <div className="absolute inset-0 bg-red-600/10 rounded-full blur-xl animate-pulse"></div>
         </motion.div>
+        */}
         <motion.h1
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}

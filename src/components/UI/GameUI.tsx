@@ -182,39 +182,42 @@ export default function GameUI({ health, keysCollected, totalKeys, poloCoins, co
         className="absolute bottom-4 left-4"
       >
         <div className="bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-sm p-4 rounded-xl max-w-xs flex items-start space-x-3 border border-red-500/30 shadow-2xl">
-          <motion.div
-            animate={{ 
-              rotate: [0, 10, -10, 0],
-              scale: [1, 1.05, 1]
-            }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="relative"
-          >
-            <img
-              src="/logos/relantro-helper.svg"
-              alt="Relantro Helper"
-              className="w-10 h-10 flex-shrink-0 drop-shadow-lg relative z-10"
+        {/* Relantro Helper - Commented out due to missing file */}
+        {/*
+        <motion.div
+          animate={{
+            rotate: [0, 10, -10, 0],
+            scale: [1, 1.05, 1]
+          }}
+          transition={{ duration: 4, repeat: Infinity }}
+          className="relative"
+        >
+          <img
+            src="/logos/relantro-helper.svg"
+            alt="Relantro Helper"
+            className="w-10 h-10 flex-shrink-0 drop-shadow-lg relative z-10"
+          />
+          // 4D Dimensional rifts
+          <div className="absolute inset-0 pointer-events-none">
+            <motion.div
+              className="absolute top-1 left-1 w-0.5 h-4 bg-cyan-400 opacity-60"
+              animate={{ scaleY: [0, 1, 0], opacity: [0, 0.6, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0 }}
             />
-            {/* 4D Dimensional rifts */}
-            <div className="absolute inset-0 pointer-events-none">
-              <motion.div
-                className="absolute top-1 left-1 w-0.5 h-4 bg-cyan-400 opacity-60"
-                animate={{ scaleY: [0, 1, 0], opacity: [0, 0.6, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 0 }}
-              />
-              <motion.div
-                className="absolute top-2 right-0.5 w-3 h-0.5 bg-magenta-400 opacity-60"
-                animate={{ scaleX: [0, 1, 0], opacity: [0, 0.6, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-              />
-              <motion.div
-                className="absolute bottom-1 left-2 w-0.5 h-3 bg-yellow-400 opacity-60"
-                animate={{ scaleY: [0, 1, 0], opacity: [0, 0.6, 0] }}
-                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-              />
-            </div>
-            <div className="absolute inset-0 bg-red-600/20 rounded-full blur-md animate-pulse"></div>
-          </motion.div>
+            <motion.div
+              className="absolute top-2 right-0.5 w-3 h-0.5 bg-magenta-400 opacity-60"
+              animate={{ scaleX: [0, 1, 0], opacity: [0, 0.6, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+            />
+            <motion.div
+              className="absolute bottom-1 left-2 w-0.5 h-3 bg-yellow-400 opacity-60"
+              animate={{ scaleY: [0, 1, 0], opacity: [0, 0.6, 0] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+            />
+          </div>
+          <div className="absolute inset-0 bg-red-600/20 rounded-full blur-md animate-pulse"></div>
+        </motion.div>
+        */}
           <div>
             <p className="text-red-400 text-sm font-bold mb-1 drop-shadow-sm">Relantro's Tip:</p>
             <p className="text-white text-xs leading-relaxed drop-shadow-sm">{getMonsterTip(monsterType)}</p>

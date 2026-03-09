@@ -7,7 +7,8 @@ interface MainMenuProps {
 export default function MainMenu({ onStart }: MainMenuProps) {
   return (
     <div className="relative flex items-center justify-center w-full h-full bg-gradient-to-b from-black via-gray-900 to-blood-900">
-      {/* Relantro Helper */}
+      {/* Relantro Helper - Commented out due to missing file */}
+      {/*
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -18,14 +19,14 @@ export default function MainMenu({ onStart }: MainMenuProps) {
           src="/logos/relantro-helper.svg"
           alt="Relantro Helper"
           className="w-16 h-16 opacity-80 drop-shadow-2xl relative z-10"
-          animate={{ 
+          animate={{
             rotate: [0, 5, -5, 0],
             scale: [1, 1.05, 1],
             y: [0, -5, 0]
           }}
           transition={{ duration: 3, repeat: Infinity }}
         />
-        {/* 4D Dimensional rifts */}
+        // 4D Dimensional rifts
         <div className="absolute inset-0 pointer-events-none">
           <motion.div
             className="absolute top-2 left-2 w-1 h-8 bg-cyan-400 opacity-60"
@@ -45,6 +46,7 @@ export default function MainMenu({ onStart }: MainMenuProps) {
         </div>
         <div className="absolute inset-0 bg-red-600/10 rounded-full blur-xl animate-pulse"></div>
       </motion.div>
+      */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}

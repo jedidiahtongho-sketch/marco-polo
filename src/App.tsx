@@ -13,11 +13,14 @@ type GameState = 'menu' | 'avatar' | 'lobby' | 'matchmaking' | 'loading' | 'play
 function App() {
   const [gameState, setGameState] = useState<GameState>('menu')
 
+  console.log('🎮 App component rendering, gameState:', gameState)
+
   // Load saved avatar data and audio on mount
   useEffect(() => {
+    console.log('🔄 App useEffect running...')
     const savedAvatar = localStorage.getItem('avatar')
     const savedUsername = localStorage.getItem('username')
-    
+
     if (savedAvatar && savedUsername) {
       setGameState('lobby')
     }
@@ -26,6 +29,8 @@ function App() {
   }, [])
 
   const loadAudioFiles = () => {
+    // Commented out audio loading due to missing files
+    /*
     const audioFiles = [
       { name: 'marco', path: '/audio/marco.mp3', options: { spatial: true } },
       { name: 'polo', path: '/audio/polo.mp3' },
@@ -43,6 +48,8 @@ function App() {
         console.warn(`Failed to load audio file: ${name}`, error)
       }
     })
+    */
+    console.log('Audio loading commented out - files not available')
   }
 
   const handleStartGame = () => {
